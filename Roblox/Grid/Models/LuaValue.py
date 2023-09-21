@@ -1,12 +1,12 @@
 from dataclasses import dataclass
-from models.LuaType import LuaType
+from Models.LuaType import LuaType
 
 @dataclass
 class LuaValue:
     """Represents a LuaValue"""
-    type: LuaType
-    value: str
-    table: list["LuaValue"]
+    type: LuaType = LuaType.LUA_TNIL
+    value: str = ""
+    table: list["LuaValue"] = None
 
 @dataclass
 class ArrayOfLuaValue:

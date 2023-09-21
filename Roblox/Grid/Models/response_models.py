@@ -1,7 +1,7 @@
 from dataclasses import dataclass
 
-from models.Status import Status
-from models.LuaValue import ArrayOfLuaValue
+from Models.Status import Status
+from Models.LuaValue import ArrayOfLuaValue
 
 @dataclass
 class HelloWorldResponse:

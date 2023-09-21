@@ -2,8 +2,8 @@ from zeep import Client
 from zeep import Transport
 from zeep import Settings
 
-from models.response_models import *
-from models.request_models import *
+from Models.response_models import *
+from Models.request_models import *
 
 class RCCServiceSoap:
     """SOAP client for interacting with RCCService.

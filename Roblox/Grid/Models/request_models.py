@@ -1,6 +1,6 @@
 from dataclasses import dataclass
-from models.Job import Job
-from models.ScriptExecution import ScriptExecution
+from Models.Job import Job
+from Models.ScriptExecution import ScriptExecution
 
 @dataclass
 class OpenJobExRequest:
