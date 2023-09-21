@@ -41,6 +41,16 @@ class RCCServiceSoap:
         self.client._default_service = service_proxy
 
     def HelloWorld(self) -> HelloWorldResponse:
-        """Calls HelloWorld on the RCCService instance and returns the response model."""
+        """Calls HelloWorld() on RCCService and returns the response model."""
         response = self.client.service.HelloWorld()
         return HelloWorldResponse(HelloWorldResult=response)
+    
+    def GetVersion(self) -> GetVersionResponse:
+        """Calls GetVersion() on RCCService and returns the response model."""
+        response = self.client.service.GetVersion()
+        return GetVersionResponse(GetVersionResult=response)
+    
+    def GetStatus(self) -> GetStatusResponse:
+        """Calls GetStatus() on RCCService and returns the response model."""
+        response = self.client.service.GetStatus()
+        return GetStatusResponse(GetStatusResult=response)
