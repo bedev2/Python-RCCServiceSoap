@@ -11,19 +11,25 @@ class RCCServiceSoap:
         host (str): The hostname or IP address where RCCService is located.
         port (int): The port RCCService is located on.
         timeout (int): The transport timeout in seconds.
+        binding_name (str): The name of the RCC binding (default is "{http://roblox.com/}RCCServiceSoap").
 
     Example:
         To use the client, first create an instance and call SOAP methods:
         >>> client = RCCServiceSoap('127.0.0.1', 64989, 5)
         >>> TODO: document the rest of this.
     """
-    def __init__(self, host: str, port: int, timeout: int):
+    def __init__(self, host: str, port: int, timeout: int, binding_name="{http://roblox.com/}RCCServiceSoap"):
         self.host = host
         self.port = port
         self.timeout = timeout
 
-        zeep_settings = Settings(strict=False, force_https=False)
+        # Configure zeep
+        zeep_settings = Settings(
+            strict=False, 
+            force_https=False
+        )
 
+        # Create client
         self.transport = Transport(timeout=timeout, operation_timeout=timeout)
         self.client = Client(
             'wsdl_files/RCCService.wsdl',
@@ -31,9 +37,7 @@ class RCCServiceSoap:
             settings=zeep_settings
         )
 
-        # https://github.com/mvantellingen/python-zeep/issues/833, this is kinda bad because some people may patch or change their RCC binding name to something else but usually its left as roblox.com
-        # TODO: add arg for binding name ?
-        service_proxy = self.client.create_service(binding_name="{http://roblox.com/}RCCServiceSoap", address=f"http://{host}:{port}")
+        service_proxy = self.client.create_service(binding_name=binding_name, address=f"http://{host}:{port}")
         self.client._default_service = service_proxy
 
     def HelloWorld(self) -> HelloWorldResponse:
