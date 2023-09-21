@@ -3,6 +3,7 @@ from zeep import Transport
 from zeep import Settings
 
 from models.response_models import *
+from models.request_models import *
 
 class RCCServiceSoap:
     """SOAP client for interacting with RCCService.
@@ -54,3 +55,25 @@ class RCCServiceSoap:
         """Calls GetStatus() on RCCService and returns the response model."""
         response = self.client.service.GetStatus()
         return GetStatusResponse(GetStatusResult=response)
+    
+    # terrible, thank you zeep and python
+    def OpenJobEx(self, job: Job, script: ScriptExecution) -> OpenJobExResponse:
+        """Calls OpenJobEx() on RCCService and returns the response model."""
+        request = {
+            'job': {
+                'id': job.id,
+                'expirationInSeconds': job.expirationInSeconds,
+                'category': job.category,
+                'cores': job.cores
+            },
+            'script': {
+                'name': script.name,
+                'script': script.script,
+                'arguments': {
+                    'LuaValue': script.arguments
+                }
+            }
+        }
+
+        response = self.client.service.OpenJobEx(**request)
+        return OpenJobExResponse(OpenJobExResult=response)
