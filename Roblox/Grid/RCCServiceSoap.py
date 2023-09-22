@@ -77,6 +77,12 @@ class RCCServiceSoap:
         response = self.client.service.OpenJobEx(**request)
         return OpenJobExResponse(OpenJobExResult=response)
     
-    def RenewLease(self, JobID: str, expirationInSeconds: float) -> float:
+    def RenewLease(self, jobId: str, expirationInSeconds: float) -> float:
         """Calls RenewLease() on RCCService and returns a float representing the time the given Job is renewed for."""
-        return
+        request = {
+            'jobID': jobId,
+            'expirationInSeconds': expirationInSeconds
+        }
+
+        response = self.client.service.RenewLease(**request)
+        return response
