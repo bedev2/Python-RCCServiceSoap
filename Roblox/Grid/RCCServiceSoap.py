@@ -79,6 +79,7 @@ class RCCServiceSoap:
         response = self.client.service.OpenJobEx(**request)
         return OpenJobExResponse(OpenJobExResult=response)
     
+    @DeprecationWarning("OpenJob() is obsolete consider using OpenJobEx() instead.")    
     def OpenJob(self, job: Job, script: ScriptExecution) -> OpenJobExResponse:
         """Calls OpenJobEx() on RCCService and returns a response model with an array of the LuaValue(s)."""
         return self.OpenJobEx(job, script)
@@ -109,6 +110,43 @@ class RCCServiceSoap:
         response = self.client.service.ExecuteEx(**request)
         return response
     
+    @DeprecationWarning("Execute() is obsolete consider using ExecuteEx() instead.")    
     def Execute(self, jobId: str, script: ScriptExecution) -> ExecuteExResponse:
         """Calls ExecuteEx() on RCCService and executes the script inside the given Job and returns a response model."""
         return self.Execute(jobId, script)
+    
+    def CloseJob(self, jobId: str) -> None:
+        """Calls CloseJob() on RCCService and attempts to close the Job if it exists."""
+        # TODO: Arbiter.cs#L186
+        request = {
+            'JobID': jobId
+        }
+
+        self.client.service.CloseJob(**request)
+
+    def BatchJobEx(self, job: Job, script: ScriptExecution) -> BatchJobExResponse:
+        """Calls BatchJobEx() on RCCService, similar to OpenJobEx() but this is for Jobs with a short life."""
+        # TODO: Taken from OpenJobEx(), we can probably reduce boilerplate for reqs
+        request = {
+            'job': {
+                'id': job.id,
+                'expirationInSeconds': job.expirationInSeconds,
+                'category': job.category,
+                'cores': job.cores
+            },
+            'script': {
+                'name': script.name,
+                'script': script.script,
+                'arguments': {
+                    'LuaValue': script.arguments
+                }
+            }
+        }
+
+        response = self.client.service.BatchJobEx(**request)
+        return response
+
+    @DeprecationWarning("BatchJob() is obsolete consider using BatchJobEx() instead.")    
+    def BatchJob(self, job: Job, script: ScriptExecution) -> BatchJobExResponse:
+        """Calls BatchJobEx() on RCCService, similar to OpenJobEx() but this is for Jobs with a short life."""
+        return self.BatchJobEx(job, script)

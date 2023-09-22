@@ -27,3 +27,8 @@ class OpenJobExResponse:
 class ExecuteExResponse:
     """Represents the ExecuteEx SOAP operation response."""
     ExecuteExResult: ArrayOfLuaValue
+
+@dataclass
+class BatchJobExResponse:
+    """Represents the BatchJobEx SOAP operation response."""
+    BatchJobExResult: ArrayOfLuaValue
