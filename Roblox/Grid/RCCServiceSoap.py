@@ -1,5 +1,8 @@
 # Copyright 2023 LA
 
+from Helpers import _create_job_request
+from Helpers import _create_script_request
+
 import logging
 
 from Models.Job import Job
@@ -10,9 +13,9 @@ from zeep import Client
 from zeep import Transport
 from zeep import Settings
 
-# TODO: Logging like this but for PY & Configurable as it will be a part of the lib: Logger.Verbose("CloseExpiredJobs starting");
+# TODO: should we handle zeep.exceptions.Fault and make a custom exception 'SoapFault' ? 
 
-class RCCServiceSoap:
+class RCCServiceSoapClient:
     """SOAP client for interacting with RCCService.
 
     Args:
@@ -35,6 +38,9 @@ class RCCServiceSoap:
         # Configure logger
         logging.basicConfig(level=log_level, format='[%(levelname)s] %(message)s')
         self.logger = logging.getLogger(__name__)
+        
+        # Disable loggers we dont want
+        self._disable_library_loggers()
 
         # Configure zeep
         zeep_settings = Settings(
@@ -53,6 +59,29 @@ class RCCServiceSoap:
         service_proxy = self.client.create_service(binding_name=binding_name, address=f"http://{host}:{port}")
         self.client._default_service = service_proxy
 
+    def _disable_library_loggers(self):
+        # https://stackoverflow.com/questions/27538879/how-to-disable-loggers-from-other-modules
+        loggers = [
+            "zeep",
+            "zeep.client",
+            "zeep.proxy",
+            "zeep.transports",
+            "zeep.wsdl.wsdl",
+            "zeep.wsdl.bindings.http",
+            "zeep.wsdl.bindings.soap",
+            "zeep.xsd.schema",
+            "zeep.xsd.types.simple",
+            "zeep.xsd.elements.attribute",
+            "zeep.xsd.elements.element",
+            "requests",
+            "requests.Session"
+            "urllib3",
+            "urllib3.connectionpool"
+        ] # god
+        
+        for _ in loggers:
+            logging.getLogger(_).disabled = True
+
 #region Operations
 
     def GetVersion(self) -> GetVersionResponse:
@@ -67,45 +96,22 @@ class RCCServiceSoap:
             raise
 
         return GetVersionResponse(GetVersionResult=version)
-
+    
     def OpenJob(self, job: Job, script: ScriptExecution) -> OpenJobExResponse:
         """Calls OpenJobEx() on RCCService and returns a response model with an array of the LuaValue(s)."""
         request = {
-            'job': {
-                'id': job.id,
-                'expirationInSeconds': job.expirationInSeconds,
-                'category': job.category,
-                'cores': job.cores
-            },
-            'script': {
-                'name': script.name,
-                'script': script.script,
-                'arguments': {
-                    'LuaValue': script.arguments
-                }
-            }
+            **_create_job_request(job),
+            **_create_script_request(script)
         }
-
         response = self.client.service.OpenJobEx(**request)
+
         return OpenJobExResponse(OpenJobExResult=response)
 
     def BatchJob(self, job: Job, script: ScriptExecution) -> BatchJobExResponse:
         """Calls BatchJobEx() on RCCService, similar to OpenJobEx() but this is for Jobs with a short life."""
-        # TODO: Taken from OpenJobEx(), we can probably reduce boilerplate for reqs
         request = {
-            'job': {
-                'id': job.id,
-                'expirationInSeconds': job.expirationInSeconds,
-                'category': job.category,
-                'cores': job.cores
-            },
-            'script': {
-                'name': script.name,
-                'script': script.script,
-                'arguments': {
-                    'LuaValue': script.arguments
-                }
-            }
+            **_create_job_request(job),
+            **_create_script_request(script)
         }
 
         response = self.client.service.BatchJobEx(**request)
@@ -124,14 +130,8 @@ class RCCServiceSoap:
     def Execute(self, jobId: str, script: ScriptExecution) -> ExecuteExResponse:
         """Calls ExecuteEx() on RCCService and executes the script inside the given Job and returns a response model."""
         request = {
-            'JobID': jobId,
-            'script': {
-                'name': script.name,
-                'script': script.script,
-                'arguments': {
-                    'LuaValue': script.arguments
-                }
-            }
+            'jobID': jobId,
+            **_create_script_request(script)
         }
 
         response = self.client.service.ExecuteEx(**request)
@@ -141,7 +141,7 @@ class RCCServiceSoap:
         """Calls CloseJob() on RCCService and attempts to close the Job if it exists."""
         # TODO: Arbiter.cs#L186
         request = {
-            'JobID': jobId
+            'jobID': jobId
         }
 
         self.client.service.CloseJob(**request)
@@ -149,7 +149,7 @@ class RCCServiceSoap:
     def GetExpiration(self, jobId: str) -> GetExpirationResponse:
         """Calls GetExpiration() on RCCService and returns a float representing the seconds until Job is expired."""
         request = {
-            'JobID': jobId
+            'jobID': jobId
         }
 
         response = self.client.service.GetExpiration(**request)
@@ -158,7 +158,7 @@ class RCCServiceSoap:
     def Diag(self, type: int, jobId: str) -> DiagExResponse:
         request = {
             'type': type,
-            'JobID': jobId
+            'jobID': jobId
         }
 
         response = self.client.service.DiagEx(**request)

@@ -1,15 +1,11 @@
 # Copyright 2023 LA
 
-from RCCServiceSoap import RCCServiceSoap
+from RCCServiceSoap import RCCServiceSoapClient
 
 class GridServiceUtils:
     @staticmethod
-    def GetService(address: str, port: int):
+    def GetService(address: str, port: int, timeout: int = 20):
         if not address:
             return None
         
-        return RCCServiceSoap(f"http://{address}:{port}")
-
-    @staticmethod
-    def GetService(address: str) -> RCCServiceSoap:
-        return GridServiceUtils.GetService(address, 64989)
+        return RCCServiceSoapClient(address, port, timeout)
