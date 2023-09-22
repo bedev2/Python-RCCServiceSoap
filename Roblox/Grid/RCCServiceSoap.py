@@ -2,8 +2,9 @@ from zeep import Client
 from zeep import Transport
 from zeep import Settings
 
+from Models.Job import Job
+from Models.ScriptExecution import ScriptExecution
 from Models.response_models import *
-from Models.request_models import *
 
 # TODO: Logging like this but for PY & Configurable as it will be a part of the lib: Logger.Verbose("CloseExpiredJobs starting");
 
@@ -137,9 +138,14 @@ class RCCServiceSoap:
         response = self.client.service.GetExpiration(**request)
         return response
 
-    def Diag(self, type: int, jobId: str) -> str:
-        # TODO
-        return "todo"
+    def Diag(self, type: int, jobId: str) -> DiagExResponse:
+        request = {
+            'type': type,
+            'JobID': jobId
+        }
+
+        response = self.client.service.DiagEx(**request)
+        return response
     
     def GetStatus(self) -> GetStatusResponse:
         """Calls GetStatus() on RCCService and returns the response model."""

@@ -80,3 +80,10 @@ class CloseAllJobsResponse:
 
     CloseAllJobsResult: int
     """Represents the amount of Jobs that were closed."""
+
+@dataclass
+class DiagExResponse:
+    """Represents the DiagEx() SOAP operation response."""
+
+    DiagExResult: ArrayOfLuaValue
+    """Represents an array of all the LuaValue(s) returned."""
