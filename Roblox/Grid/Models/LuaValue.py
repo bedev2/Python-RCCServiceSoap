@@ -10,9 +10,6 @@ class LuaValue:
     value: str = ""
     table: list["LuaValue"] = field(default_factory=list)
 
-    def __str__(self):
-        return f"LuaValue({self.type}, '{self.value}', {self.table})"
-
 @dataclass
 class ArrayOfLuaValue:
     """Represents an array of the LuaValue class"""
