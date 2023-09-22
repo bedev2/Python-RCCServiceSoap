@@ -1,3 +1,5 @@
+# Copyright 2023 LA
+
 from dataclasses import dataclass
 
 @dataclass

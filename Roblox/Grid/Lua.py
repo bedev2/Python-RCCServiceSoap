@@ -1,3 +1,5 @@
+# Copyright 2023 LA
+
 from Models.ScriptExecution import ScriptExecution
 from Models.LuaValue import LuaValue
 from Models.LuaType import LuaType

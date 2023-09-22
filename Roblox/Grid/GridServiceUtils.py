@@ -1,3 +1,5 @@
+# Copyright 2023 LA
+
 from RCCServiceSoap import RCCServiceSoap
 
 class GridServiceUtils:

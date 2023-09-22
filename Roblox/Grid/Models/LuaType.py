@@ -1,3 +1,5 @@
+# Copyright 2023 LA
+
 from enum import Enum
 
 class LuaType(Enum):
