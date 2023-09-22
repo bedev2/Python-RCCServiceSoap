@@ -64,7 +64,7 @@ print_result("Job Expiration Is", get_expiration.GetExpirationResult)
 
 # Example #9: Diag; Diag is obvious by the name if you don't already know what it is it's used for diagnostics!
 diag = client.Diag(0, job.id) # Diag takes an int argument called 'Type': 0 = Diagnostics Data, 1 = Leak Dump, 2 = Attempts to allocate 500k and returns True if successful else False, 4 = DataModel dutyCycles
-parse_job_response(diag.DiagExResult) # yes diag is an array of lua values
+parse_job_response(diag.DiagExResult) # yes diag is an array of lua values, NOTE: some of the tables in diag are nested if you even ever use diag i suggest you take this into note
 
 # This is about it everything else should be easy
 
