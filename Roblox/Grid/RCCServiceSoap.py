@@ -168,3 +168,6 @@ class RCCServiceSoap:
     def GetAllJobs(self) -> GetAllJobsExResponse:
         """Calls GetAllJobsEx() on RCCService and reutrns a response model with the array of Jobs."""
         return self.GetAllJobsEx()
+    
+    def CloseExpiredJobs(self) -> None:
+        """Attempts to close all expired Jobs and returns a response model with the amount of Jobs that were closed."""
