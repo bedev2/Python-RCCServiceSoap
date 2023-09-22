@@ -43,22 +43,14 @@ class RCCServiceSoap:
         service_proxy = self.client.create_service(binding_name=binding_name, address=f"http://{host}:{port}")
         self.client._default_service = service_proxy
 
-    def HelloWorld(self) -> HelloWorldResponse:
-        """Calls HelloWorld() on RCCService and returns the response model."""
-        response = self.client.service.HelloWorld()
-        return HelloWorldResponse(HelloWorldResult=response)
-    
+#region Operations
+
     def GetVersion(self) -> GetVersionResponse:
         """Calls GetVersion() on RCCService and returns the response model."""
         response = self.client.service.GetVersion()
         return GetVersionResponse(GetVersionResult=response)
-    
-    def GetStatus(self) -> GetStatusResponse:
-        """Calls GetStatus() on RCCService and returns the response model."""
-        response = self.client.service.GetStatus()
-        return GetStatusResponse(GetStatusResult=response)
-    
-    def OpenJobEx(self, job: Job, script: ScriptExecution) -> OpenJobExResponse:
+
+    def OpenJob(self, job: Job, script: ScriptExecution) -> OpenJobExResponse:
         """Calls OpenJobEx() on RCCService and returns a response model with an array of the LuaValue(s)."""
         request = {
             'job': {
@@ -78,53 +70,8 @@ class RCCServiceSoap:
 
         response = self.client.service.OpenJobEx(**request)
         return OpenJobExResponse(OpenJobExResult=response)
-    
-    @DeprecationWarning("OpenJob() is obsolete consider using OpenJobEx() instead.")    
-    def OpenJob(self, job: Job, script: ScriptExecution) -> OpenJobExResponse:
-        """Calls OpenJobEx() on RCCService and returns a response model with an array of the LuaValue(s)."""
-        return self.OpenJobEx(job, script)
 
-    def RenewLease(self, jobId: str, expirationInSeconds: float) -> RenewLeaseResponse:
-        """Calls RenewLease() on RCCService and returns a float representing the time the given Job is renewed for."""
-        request = {
-            'jobID': jobId,
-            'expirationInSeconds': expirationInSeconds
-        }
-
-        response = self.client.service.RenewLease(**request)
-        return response
-    
-    def ExecuteEx(self, jobId: str, script: ScriptExecution) -> ExecuteExResponse:
-        """Calls ExecuteEx() on RCCService and executes the script inside the given Job and returns a response model."""
-        request = {
-            'JobID': jobId,
-            'script': {
-                'name': script.name,
-                'script': script.script,
-                'arguments': {
-                    'LuaValue': script.arguments
-                }
-            }
-        }
-
-        response = self.client.service.ExecuteEx(**request)
-        return response
-    
-    @DeprecationWarning("Execute() is obsolete consider using ExecuteEx() instead.")    
-    def Execute(self, jobId: str, script: ScriptExecution) -> ExecuteExResponse:
-        """Calls ExecuteEx() on RCCService and executes the script inside the given Job and returns a response model."""
-        return self.Execute(jobId, script)
-    
-    def CloseJob(self, jobId: str) -> None:
-        """Calls CloseJob() on RCCService and attempts to close the Job if it exists."""
-        # TODO: Arbiter.cs#L186
-        request = {
-            'JobID': jobId
-        }
-
-        self.client.service.CloseJob(**request)
-
-    def BatchJobEx(self, job: Job, script: ScriptExecution) -> BatchJobExResponse:
+    def BatchJob(self, job: Job, script: ScriptExecution) -> BatchJobExResponse:
         """Calls BatchJobEx() on RCCService, similar to OpenJobEx() but this is for Jobs with a short life."""
         # TODO: Taken from OpenJobEx(), we can probably reduce boilerplate for reqs
         request = {
@@ -146,11 +93,41 @@ class RCCServiceSoap:
         response = self.client.service.BatchJobEx(**request)
         return response
 
-    @DeprecationWarning("BatchJob() is obsolete consider using BatchJobEx() instead.")    
-    def BatchJob(self, job: Job, script: ScriptExecution) -> BatchJobExResponse:
-        """Calls BatchJobEx() on RCCService, similar to OpenJobEx() but this is for Jobs with a short life."""
-        return self.BatchJobEx(job, script)
-    
+    def RenewLease(self, jobId: str, expirationInSeconds: float) -> RenewLeaseResponse:
+        """Calls RenewLease() on RCCService and returns a float representing the time the given Job is renewed for."""
+        request = {
+            'jobID': jobId,
+            'expirationInSeconds': expirationInSeconds
+        }
+
+        response = self.client.service.RenewLease(**request)
+        return response
+
+    def Execute(self, jobId: str, script: ScriptExecution) -> ExecuteExResponse:
+        """Calls ExecuteEx() on RCCService and executes the script inside the given Job and returns a response model."""
+        request = {
+            'JobID': jobId,
+            'script': {
+                'name': script.name,
+                'script': script.script,
+                'arguments': {
+                    'LuaValue': script.arguments
+                }
+            }
+        }
+
+        response = self.client.service.ExecuteEx(**request)
+        return response
+
+    def CloseJob(self, jobId: str) -> None:
+        """Calls CloseJob() on RCCService and attempts to close the Job if it exists."""
+        # TODO: Arbiter.cs#L186
+        request = {
+            'JobID': jobId
+        }
+
+        self.client.service.CloseJob(**request)
+
     def GetExpiration(self, jobId: str) -> GetExpirationResponse:
         """Calls GetExpiration() on RCCService and returns a float representing the seconds until Job is expired."""
         request = {
@@ -159,16 +136,20 @@ class RCCServiceSoap:
 
         response = self.client.service.GetExpiration(**request)
         return response
+
+    def Diag(self, type: int, jobId: str) -> str:
+        # TODO
+        return "todo"
     
-    def GetAllJobsEx(self) -> GetAllJobsExResponse:
-        """Calls GetAllJobsEx() on RCCService and reutrns a response model with the array of Jobs."""
-        return self.client.service.GetAllJobsEx()
-    
-    @DeprecationWarning("GetAllJobs() is obsolete consider using GetAllJobsEx() instead.")    
+    def GetStatus(self) -> GetStatusResponse:
+        """Calls GetStatus() on RCCService and returns the response model."""
+        response = self.client.service.GetStatus()
+        return GetStatusResponse(GetStatusResult=response)
+
     def GetAllJobs(self) -> GetAllJobsExResponse:
         """Calls GetAllJobsEx() on RCCService and reutrns a response model with the array of Jobs."""
-        return self.GetAllJobsEx()
-    
+        return self.client.service.GetAllJobsEx()
+
     def CloseExpiredJobs(self) -> CloseExpiredJobsResponse:
         """Attempts to close all expired Jobs and returns a response model with the amount of Jobs that were closed."""
         return self.client.service.CloseExpiredJobs()
@@ -176,3 +157,10 @@ class RCCServiceSoap:
     def CloseAllJobs(self) -> CloseAllJobsResponse:
         """Attempts to close all Jobs and returns a response model with the amount of Jobs that were closed."""
         return self.client.service.CloseAllJobs()
+
+    def HelloWorld(self) -> HelloWorldResponse:
+        """Calls HelloWorld() on RCCService and returns the response model."""
+        response = self.client.service.HelloWorld()
+        return HelloWorldResponse(HelloWorldResult=response)
+
+#endregion
