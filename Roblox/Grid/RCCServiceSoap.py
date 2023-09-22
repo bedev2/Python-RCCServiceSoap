@@ -84,7 +84,7 @@ class RCCServiceSoap:
         """Calls OpenJobEx() on RCCService and returns a response model with an array of the LuaValue(s)."""
         return self.OpenJobEx(job, script)
 
-    def RenewLease(self, jobId: str, expirationInSeconds: float) -> float:
+    def RenewLease(self, jobId: str, expirationInSeconds: float) -> RenewLeaseResponse:
         """Calls RenewLease() on RCCService and returns a float representing the time the given Job is renewed for."""
         request = {
             'jobID': jobId,
@@ -150,3 +150,21 @@ class RCCServiceSoap:
     def BatchJob(self, job: Job, script: ScriptExecution) -> BatchJobExResponse:
         """Calls BatchJobEx() on RCCService, similar to OpenJobEx() but this is for Jobs with a short life."""
         return self.BatchJobEx(job, script)
+    
+    def GetExpiration(self, jobId: str) -> GetExpirationResponse:
+        """Calls GetExpiration() on RCCService and returns a float representing the seconds until Job is expired."""
+        request = {
+            'JobID': jobId
+        }
+
+        response = self.client.service.GetExpiration(**request)
+        return response
+    
+    def GetAllJobsEx(self) -> GetAllJobsExResponse:
+        """Calls GetAllJobsEx() on RCCService and reutrns a response model with the array of Jobs."""
+        return self.client.service.GetAllJobsEx()
+    
+    @DeprecationWarning("GetAllJobs() is obsolete consider using GetAllJobsEx() instead.")    
+    def GetAllJobs(self) -> GetAllJobsExResponse:
+        """Calls GetAllJobsEx() on RCCService and reutrns a response model with the array of Jobs."""
+        return self.GetAllJobsEx()

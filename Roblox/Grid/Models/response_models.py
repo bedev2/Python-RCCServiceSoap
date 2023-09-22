@@ -2,6 +2,7 @@ from dataclasses import dataclass
 
 from Models.Status import Status
 from Models.LuaValue import ArrayOfLuaValue
+from Models.Job import ArrayOfJob
 
 @dataclass
 class HelloWorldResponse:
@@ -24,6 +25,11 @@ class OpenJobExResponse:
     OpenJobExResult: ArrayOfLuaValue
 
 @dataclass
+class RenewLeaseResponse:
+    """Represents the RenewLease SOAP operation response."""
+    RenewLeaseResult: float
+
+@dataclass
 class ExecuteExResponse:
     """Represents the ExecuteEx SOAP operation response."""
     ExecuteExResult: ArrayOfLuaValue
@@ -32,3 +38,13 @@ class ExecuteExResponse:
 class BatchJobExResponse:
     """Represents the BatchJobEx SOAP operation response."""
     BatchJobExResult: ArrayOfLuaValue
+
+@dataclass
+class GetExpirationResponse:
+    """Represents the GetExpiratioN SOAP operation response."""
+    GetExpirationResult: float
+
+@dataclass
+class GetAllJobsExResponse:
+    """Represents the GetAllJobsEx SOAP operation response."""
+    GetAllJobsExResult: ArrayOfJob
