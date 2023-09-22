@@ -5,6 +5,8 @@ from zeep import Settings
 from Models.response_models import *
 from Models.request_models import *
 
+# TODO: Logging like this but for PY & Configurable as it will be a part of the lib: Logger.Verbose("CloseExpiredJobs starting");
+
 class RCCServiceSoap:
     """SOAP client for interacting with RCCService.
 
@@ -77,6 +79,10 @@ class RCCServiceSoap:
         response = self.client.service.OpenJobEx(**request)
         return OpenJobExResponse(OpenJobExResult=response)
     
+    def OpenJob(self, job: Job, script: ScriptExecution) -> OpenJobExResponse:
+        """Calls OpenJobEx() on RCCService and returns a response model with an array of the LuaValue(s)."""
+        return self.OpenJobEx(job, script)
+
     def RenewLease(self, jobId: str, expirationInSeconds: float) -> float:
         """Calls RenewLease() on RCCService and returns a float representing the time the given Job is renewed for."""
         request = {
@@ -86,3 +92,23 @@ class RCCServiceSoap:
 
         response = self.client.service.RenewLease(**request)
         return response
+    
+    def ExecuteEx(self, jobId: str, script: ScriptExecution) -> ExecuteExResponse:
+        """Calls ExecuteEx() on RCCService and executes the script inside the given Job and returns a response model."""
+        request = {
+            'JobID': jobId,
+            'script': {
+                'name': script.name,
+                'script': script.script,
+                'arguments': {
+                    'LuaValue': script.arguments
+                }
+            }
+        }
+
+        response = self.client.service.ExecuteEx(**request)
+        return response
+    
+    def Execute(self, jobId: str, script: ScriptExecution) -> ExecuteExResponse:
+        """Calls ExecuteEx() on RCCService and executes the script inside the given Job and returns a response model."""
+        return self.Execute(jobId, script)

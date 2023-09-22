@@ -22,3 +22,8 @@ class GetStatusResponse:
 class OpenJobExResponse:
     """Represents the OpenJobEx SOAP operation response."""
     OpenJobExResult: ArrayOfLuaValue
+
+@dataclass
+class ExecuteExResponse:
+    """Represents the ExecuteEx SOAP operation response."""
+    ExecuteExResult: ArrayOfLuaValue
