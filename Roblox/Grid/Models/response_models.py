@@ -73,3 +73,10 @@ class CloseExpiredJobsResponse:
     
     CloseExpiredJobsResult: int
     """Represents the amount of Jobs that were closed."""
+
+@dataclass
+class CloseAllJobsResponse:
+    """Represents the CloseAllJobs() SOAP operation response."""
+
+    CloseAllJobsResult: int
+    """Represents the amount of Jobs that were closed."""
