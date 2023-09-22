@@ -16,51 +16,20 @@ from zeep import Settings
 # TODO: should we handle zeep.exceptions.Fault and make a custom exception 'SoapFault' ? 
 
 class RCCServiceSoapClient:
-    """SOAP client for interacting with RCCService.
-
-    Args:
-        host (str): The hostname or IP address where RCCService is located.
-        port (int): The port RCCService is located on.
-        timeout (int): The transport timeout in seconds.
-        binding_name (str): The name of the RCC binding (default is "{http://roblox.com/}RCCServiceSoap").
-        log_level (int): The level the logger will use, see https://docs.python.org/3/library/logging.html#levels for levels.
-
-    Example:
-        To use the client, first create an instance and call SOAP methods:
-        >>> client = RCCServiceSoap('127.0.0.1', 64989, 5)
-        >>> TODO: document the rest of this.
-    """
     def __init__(self, host: str, port: int, timeout: int, binding_name: str = "{http://roblox.com/}RCCServiceSoap", log_level: int = logging.DEBUG):
         self.host = host
         self.port = port
         self.timeout = timeout
+        self.logger = self._configure_logger(log_level)
+        self._configure_zeep()
+        self.client = self._create_client(binding_name)
 
-        # Configure logger
+    def _configure_logger(self, log_level: int) -> logging.Logger:
         logging.basicConfig(level=log_level, format='[%(levelname)s] %(message)s')
-        self.logger = logging.getLogger(__name__)
-        
-        # Disable loggers we dont want
         self._disable_library_loggers()
-
-        # Configure zeep
-        zeep_settings = Settings(
-            strict=False, 
-            force_https=False
-        )
-
-        # Create client
-        self.transport = Transport(timeout=timeout, operation_timeout=timeout)
-        self.client = Client(
-            'wsdl_files/RCCService.wsdl',
-            transport=self.transport,
-            settings=zeep_settings
-        )
-
-        service_proxy = self.client.create_service(binding_name=binding_name, address=f"http://{host}:{port}")
-        self.client._default_service = service_proxy
-
+        return logging.getLogger(__name__)
+    
     def _disable_library_loggers(self):
-        # https://stackoverflow.com/questions/27538879/how-to-disable-loggers-from-other-modules
         loggers = [
             "zeep",
             "zeep.client",
@@ -77,12 +46,26 @@ class RCCServiceSoapClient:
             "requests.Session"
             "urllib3",
             "urllib3.connectionpool"
-        ] # god
-        
+        ]
         for _ in loggers:
             logging.getLogger(_).disabled = True
 
-#region Operations
+    def _configure_zeep(self):
+        self.zeep_settings = Settings(
+            strict=False, 
+            force_https=False
+        )
+        self.transport = Transport(timeout=self.timeout, operation_timeout=self.timeout)
+
+    def _create_client(self, binding_name: str) -> Client:
+        client = Client(
+            'wsdl_files/RCCService.wsdl',
+            transport=self.transport,
+            settings=self.zeep_settings
+        )
+        service_proxy = client.create_service(binding_name, f"http://{self.host}:{self.port}")
+        client._default_service = service_proxy
+        return client
 
     def GetVersion(self) -> GetVersionResponse:
         """Calls GetVersion() on RCCService and returns the response model."""
@@ -246,5 +229,3 @@ class RCCServiceSoapClient:
         """Calls HelloWorld() on RCCService and returns the response model."""
         response = self.client.service.HelloWorld()
         return HelloWorldResponse(HelloWorldResult=response)
-
-#endregion
