@@ -7,3 +7,8 @@ class Job:
     expirationInSeconds: float
     category: int
     cores: float
+
+@dataclass
+class ArrayOfJob:
+    """Represents an array of the Job class"""
+    Job: list[Job]

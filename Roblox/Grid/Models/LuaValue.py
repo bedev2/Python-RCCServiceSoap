@@ -10,4 +10,5 @@ class LuaValue:
 
 @dataclass
 class ArrayOfLuaValue:
+    """Represents an array of the LuaValue class"""
     LuaValue: list[LuaValue]

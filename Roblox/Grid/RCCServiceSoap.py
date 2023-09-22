@@ -56,9 +56,8 @@ class RCCServiceSoap:
         response = self.client.service.GetStatus()
         return GetStatusResponse(GetStatusResult=response)
     
-    # terrible, thank you zeep and python
     def OpenJobEx(self, job: Job, script: ScriptExecution) -> OpenJobExResponse:
-        """Calls OpenJobEx() on RCCService and returns the response model."""
+        """Calls OpenJobEx() on RCCService and returns a response model with an array of the LuaValue(s)."""
         request = {
             'job': {
                 'id': job.id,
@@ -77,3 +76,7 @@ class RCCServiceSoap:
 
         response = self.client.service.OpenJobEx(**request)
         return OpenJobExResponse(OpenJobExResult=response)
+    
+    def RenewLease(self, JobID: str, expirationInSeconds: float) -> float:
+        """Calls RenewLease() on RCCService and returns a float representing the time the given Job is renewed for."""
+        return
